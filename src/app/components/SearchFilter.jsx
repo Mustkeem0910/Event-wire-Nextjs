@@ -253,7 +253,7 @@ const getLocationSuggestions = async (value) => {
     {/* ================== Left Content for Large Screens===========  */}
     <div className="w-1/2 mt-20 xl:mt-20 2xl:mt-24 hidden xl:block 2xl:block 3xl:block">
       <h1 className="text-4xl font-bold text-black">
-        Let's find your dream team
+        Let&rsquo;s find your dream team
       </h1>
       <p className="text-lg text-text100 mt-4">
         Search over 250,000 local professionals with reviews, pricing, availability, and more.
@@ -308,7 +308,7 @@ const getLocationSuggestions = async (value) => {
     {/* ================== Left Content for Medium Screens===========  */}
 <div className=" w-full    my-7  hidden xl:hidden lg:block md:block sm:block  ">
         <h1 className="text-3xl sm:text-xl md:text-2xl lg:text-3xl flex justify-center  font-bold text-black">
-          Let's find your dream team
+          Let&rsquo;s find your dream team
         </h1>
         <p className="text-lg sm:text-sm md:text-sm lg:text-lg align-center flex justify-center text-text100 mt-4">
           Search over 250,000 local professionals with reviews, pricing,
@@ -372,7 +372,7 @@ const getLocationSuggestions = async (value) => {
  {/* Left Content for Small Screens */}
  <div className="w-full p-2 mt-3 lg:hidden md:hidden sm:hidden">
         <h1 className="text-xl  flex justify-center font-bold text-black">
-          Let's find your dream team
+          Let&rsquo;s find your dream team
         </h1>
         <p className="text-sm text-center flex justify-center text-text100 mt-3">
           Search over 250,000 local professionals with reviews, pricing,

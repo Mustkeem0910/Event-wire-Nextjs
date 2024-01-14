@@ -208,7 +208,7 @@ const Page = () => {
 
               <div className="mb-6">
                 <h6 className="text-sm  text-gray-500 mb-1">
-                  By clicking 'Button', I agree to Company Name’s{" "}
+                By clicking &lsquo;Button&rsquo;, I agree to Company Name&rsquo;s{' '}
                   <span className="font-semibold">Privacy Policy</span> and{" "}
                   <span className="font-semibold">Terms of Use</span>
                 </h6>

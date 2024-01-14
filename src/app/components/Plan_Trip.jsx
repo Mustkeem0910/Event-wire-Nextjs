@@ -58,7 +58,8 @@ const Plan_Trip = () => {
         Plan your destination event
       </h1>
       <p className="text-sm sm:text-sm md:text-md lg:text-lg xl:text-lg 2xl:text-lg 3xl:text-lg text-black mt-2">
-        No matter where in the world you want to get married, Company Name's directory of international wedding professionals can help you celebrate.
+      No matter where in the world you want to get married, Company Name&rsquo;s directory of international wedding professionals can help you celebrate.
+
       </p>
 
       {/* Carousel */}
