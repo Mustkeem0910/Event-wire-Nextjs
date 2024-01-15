@@ -602,7 +602,7 @@ const SmallNavbar = () => {
                 className="cursor-pointer text-black py-2"
                 onClick={() => {
                   console.log("Clicked!");
-                  router.push(`/shared?venue_id=${vendorType.id}`);
+                  router.push(`/shared/vendor?vendor_id=${vendorType.id}`);
                 }}
               >
                 {vendorType.name}
