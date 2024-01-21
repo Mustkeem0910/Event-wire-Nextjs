@@ -40,7 +40,13 @@ const SearchHero = () => {
 
   const [venueData, setVenueData] = useState({ venues: [] });
   const [vendorData, setVendorData] = useState({ vendors: [] });
-  const [cityData, setCityData] = useState(null);
+  const [cityData, setCityData] = useState('');
+  const [venueTypeName, setVenueTypeName] = useState('');
+  const [vendorTypeName, setVendorTypeName] = useState('');
+  const [venueTypeId, setVenueTypeId] = useState('');
+  const [cityId, setCityId] = useState('');
+  const [vendorTypeId, setVendorTypeId] = useState('');
+  const [heroText, setHeroText] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,19 +71,29 @@ const SearchHero = () => {
         const city = searchParams.get("city_id");
         const vendorType = searchParams.get("vendor_id");
         const path = window.location.pathname;
+        setVenueTypeId(venueType);
+        setCityId(city);
+        setVendorTypeId(vendorType);
 
-        if (path === "/shared/") {
+        if (path === "/shared") {
           if (venueType && !city) {
+
             const fetchedVenueData = await getVenueTypeById(venueType);
             setVenueData({ venues: fetchedVenueData.venues });
+            setVenueTypeName(fetchedVenueData.type);
+            setHeroText(fetchedVenueData.type);
           } else if (venueType && city) {
             const fetchedVenueData = await getVenueTypeById(venueType);
             const filteredVenues = fetchedVenueData.venues.filter(
               (venue) => parseInt(city) === venue.city
             );
             setVenueData({ venues: filteredVenues });
+            setVenueTypeName(fetchedVenueData.type);
             const fetchedCityData = await getCityById(city);
-            setCityData(fetchedCityData);
+            console.log("fetchedVenueData.type",fetchedVenueData.type);
+            console.log("fetchedCityData.name",fetchedCityData.name);
+            setCityData(fetchedCityData.name);
+            setHeroText(fetchedVenueData.type);
           } else if (!venueType && city) {
             const allVenues = await fetchVenues();
             const filteredVenues = allVenues.filter(
@@ -85,23 +101,30 @@ const SearchHero = () => {
             );
             setVenueData({ venues: filteredVenues });
             const fetchedCityData = await getCityById(city);
-            setCityData(fetchedCityData);
+            setCityData(fetchedCityData.name);
+            setHeroText('Venues');
           } else {
+
             const fetchedVenueData = await fetchVenues();
             setVenueData({ venues: fetchedVenueData });
+            setHeroText('Venues');
           }
-        } else if (path === "/shared/vendor/") {
+        } else if (path === "/shared/vendor") {
           if (vendorType && !city) {
             const fetchedVendorData = await getVendorTypeById(vendorType);
             setVendorData({ vendors: fetchedVendorData.vendors });
+            setVendorTypeName(fetchedVendorData.name);
+            setHeroText(fetchedVendorData.name);
           } else if (vendorType && city) {
             const fetchedVendorData = await getVendorTypeById(vendorType);
             const filteredVendors = fetchedVendorData.vendors.filter(
               (vendor) => parseInt(city) === vendor.city
             );
             setVendorData({ vendors: filteredVendors });
+            setVendorTypeName(fetchedVendorData.name);
             const fetchedCityData = await getCityById(city);
-            setCityData(fetchedCityData);
+            setCityData(fetchedCityData.name);
+            setHeroText(fetchedVendorData.name);
           } else if (!vendorType && city) {
             const allVendors = await fetchVendors();
             const filteredVendors = allVendors.filter(
@@ -109,10 +132,11 @@ const SearchHero = () => {
             );
             setVendorData({ vendors: filteredVendors });
             const fetchedCityData = await getCityById(city);
-            setCityData(fetchedCityData);
+            setCityData(fetchedCityData.name);
           } else {
             const fetchedVendorData = await fetchVendors();
             setVendorData({ vendors: fetchedVendorData });
+            setHeroText('Vendors');
           }
         }
       } catch (error) {
@@ -303,6 +327,284 @@ const SearchHero = () => {
     onChange: (event, { newValue }) => setLocationValue(newValue),
   };
 
+
+  const generateBreadcrumbs = (venueTypeName,vendorTypeName,cityData,venueTypeId, vendorTypeId,cityId) => {
+    const path = window.location.pathname;
+    const breadcrumbs = [];
+    console.log("path:",path);
+    // Home breadcrumb
+    breadcrumbs.push(
+      <li key="home" className="inline-flex items-center">
+        <a
+          className="flex items-center text-sm text-black hover:text-primary focus:outline-none focus:text-primary "
+          href="/"
+        >
+          Home
+        </a>
+        <svg
+          className="flex-shrink-0 h-5 w-5 text-gray-400 dark:text-gray-600 mx-2"
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <path
+            d="M6 13L10 3"
+            stroke="currentColor"
+            stroke-linecap="round"
+          />
+        </svg>
+      </li>
+    );
+
+    // Check for '/shared/vendor/' in the URL
+    if (path.includes("/shared/vendor")) {
+      breadcrumbs.push(
+        <li key="vendors" className="inline-flex items-center">
+          <a
+            className="flex items-center text-sm text-black hover:text-primary focus:outline-none focus:text-primary"
+            href="/shared/vendor/"
+          >
+            Vendors
+            <svg
+              className="flex-shrink-0 h-5 w-5 text-gray-400 dark:text-gray-600 mx-2"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M6 13L10 3"
+                stroke="currentColor"
+                stroke-linecap="round"
+              />
+            </svg>
+          </a>
+        </li>
+      );
+    } else if (path === "/shared") {
+      // Check for '/shared/' in the URL
+      breadcrumbs.push(
+        <li key="venues" className="inline-flex items-center">
+          <a
+            className="flex items-center text-sm text-black hover:text-primary focus:outline-none focus:text-primary"
+            href="/shared/"
+          >
+            Venues
+            <svg
+              className="flex-shrink-0 h-5 w-5 text-gray-400 dark:text-gray-600 mx-2"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M6 13L10 3"
+                stroke="currentColor"
+                stroke-linecap="round"
+              />
+            </svg>
+          </a>
+        </li>
+      );
+    }
+
+    // Check for venue_id and city_id in the URL
+    const venueType = searchParams.get("venue_id");
+    const city = searchParams.get("city_id");
+    const vendorType = searchParams.get("vendor_id"); 
+
+    if (venueType && !city) {
+      // Fetch venue type and city data and add to breadcrumbs
+      // ...
+
+      // Example:
+      breadcrumbs.push(
+        <li key="venueType" className="inline-flex items-center">
+          <a
+            className="flex items-center text-sm text-black hover:text-primary focus:outline-none focus:text-primary"
+            href={`/shared?venue_id=${venueTypeId}`}
+          >
+            {venueTypeName}
+            <svg
+              className="flex-shrink-0 h-5 w-5 text-gray-400 dark:text-gray-600 mx-2"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M6 13L10 3"
+                stroke="currentColor"
+                stroke-linecap="round"
+              />
+            </svg>
+          </a>
+        </li>
+      );
+    }
+    else if (venueType && city) {
+      // Fetch venue type and city data and add to breadcrumbs
+      // ...
+
+      // Example:
+      breadcrumbs.push(
+        <li key="venueType" className="inline-flex items-center">
+          <a
+            className="flex items-center text-sm text-black hover:text-primary focus:outline-none focus:text-primary"
+            href={`/shared?venue_id=${venueTypeId}`}
+          >
+            {venueTypeName}
+            <svg
+              className="flex-shrink-0 h-5 w-5 text-gray-400 dark:text-gray-600 mx-2"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M6 13L10 3"
+                stroke="currentColor"
+                stroke-linecap="round"
+              />
+            </svg>
+          </a>
+        </li>,
+        <li key="city" className="inline-flex items-center">
+          <a
+            className="flex items-center text-sm text-black hover:text-primary focus:outline-none focus:text-primary"
+            href={`/shared?venue_id=${venueTypeId}&city_id=${cityId}`}
+          >
+            {cityData}
+            <svg
+              className="flex-shrink-0 h-5 w-5 text-gray-400 dark:text-gray-600 mx-2"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M6 13L10 3"
+                stroke="currentColor"
+                stroke-linecap="round"
+              />
+            </svg>
+          </a>
+        </li>
+      );
+    }
+
+    else if (vendorType && !city) {
+      // Fetch venue type and city data and add to breadcrumbs
+      // ...
+
+      // Example:
+      breadcrumbs.push(
+        <li key="venueType" className="inline-flex items-center">
+          <a
+            className="flex items-center text-sm text-black hover:text-primary focus:outline-none focus:text-primary"
+            href={`/shared/vendor?vendor_id=${vendorTypeId}`}
+          >
+            {vendorTypeName}
+            <svg
+              className="flex-shrink-0 h-5 w-5 text-gray-400 dark:text-gray-600 mx-2"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M6 13L10 3"
+                stroke="currentColor"
+                stroke-linecap="round"
+              />
+            </svg>
+          </a>
+        </li>
+      );
+    }
+    else if (vendorType && city) {
+      // Fetch venue type and city data and add to breadcrumbs
+      // ...
+
+      // Example:
+      breadcrumbs.push(
+        <li key="venueType" className="inline-flex items-center">
+          <a
+            className="flex items-center text-sm text-black hover:text-primary focus:outline-none focus:text-primary"
+            href={`/shared/vendor?vendor_id=${vendorTypeId}`}
+          >
+            {vendorTypeName}
+            <svg
+              className="flex-shrink-0 h-5 w-5 text-gray-400 dark:text-gray-600 mx-2"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M6 13L10 3"
+                stroke="currentColor"
+                stroke-linecap="round"
+              />
+            </svg>
+          </a>
+        </li>,
+        <li key="city" className="inline-flex items-center">
+          <a
+            className="flex items-center text-sm text-black hover:text-primary focus:outline-none focus:text-primary"
+            href={`/shared/vendor?vendor_id=${vendorTypeId}&city_id=${cityId}`}
+          >
+            {cityData}
+            <svg
+              className="flex-shrink-0 h-5 w-5 text-gray-400 dark:text-gray-600 mx-2"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M6 13L10 3"
+                stroke="currentColor"
+                stroke-linecap="round"
+              />
+            </svg>
+          </a>
+        </li>
+      );
+    }
+    
+
+    // ... (add more conditions based on your URL parameters)
+
+    return (
+      <ol
+        className="flex items-center whitespace-nowrap"
+        aria-label="Breadcrumb"
+      >
+        {breadcrumbs}
+      </ol>
+    );
+  };
+
   return (
     <>
       {/* Main Content */}
@@ -311,84 +613,13 @@ const SearchHero = () => {
         <div className="w-full  sm:w-full  md:w-1/2 lg:w-1/2 xl:w-1/2 2xl:w-1/2 3xl:w-1/2   ">
           {/* Breadcrumbs */}
           <div className="mt-5 hidden  sm:hidden  md:block lg:block xl:block 2xl:block 3xl:block">
-            {/* Breadcrumbs */}
-            <ol
-              className="flex items-center whitespace-nowrap"
-              aria-label="Breadcrumb"
-            >
-              <li className="inline-flex items-center">
-                <a
-                  className="flex items-center text-sm text-black hover:text-primary focus:outline-none focus:text-primary "
-                  href="/"
-                >
-                  Home
-                </a>
-                <svg
-                  className="flex-shrink-0 h-5 w-5 text-gray-400 dark:text-gray-600 mx-2"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M6 13L10 3"
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                  />
-                </svg>
-              </li>
-              <li className="inline-flex items-center">
-                <a
-                  className="flex items-center text-sm text-black hover:text-primary focus:outline-none focus:text-primary"
-                  href="#"
-                >
-                  Wedding Venues
-                  <svg
-                    className="flex-shrink-0 h-5 w-5 text-gray-400 dark:text-gray-600 mx-2"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M6 13L10 3"
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                    />
-                  </svg>
-                </a>
-              </li>
-              <li className="inline-flex items-center">
-                <a
-                  className="flex items-center text-sm text-black hover:text-primary focus:outline-none focus:text-primary"
-                  href="#"
-                >
-                  Alabama Birmingham
-                  <svg
-                    className="flex-shrink-0 h-5 w-5 text-gray-400 dark:text-gray-600 mx-2"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M6 13L10 3"
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                    />
-                  </svg>
-                </a>
-              </li>
-            </ol>
+            {generateBreadcrumbs(venueTypeName,vendorTypeName,cityData,venueTypeId, vendorTypeId,cityId)}
           </div>
-          <h1 className="text-lg sm:text-lg md:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl font-bold mt-5 text-black">
-            Birmingham <span> Wedding Venues</span>
+          <h1 className="text-lg sm:text-lg md:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl font-bold mt-5 text-black" onClick={() => {
+    console.log('Venue Type:', venueTypeName);
+    console.log('City Data:', cityData);
+  }}>
+            {cityData} <span> {heroText}</span>
           </h1>
           {/* Sreach */}
           <div className="hidden sm:block md:block lg:block xl:block 2xl:block 3xl:block">

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://eventwire.onrender.com/api'; // Replace with your actual API base URL
+const API_BASE_URL = 'http://127.0.0.1:8000/api'; // Replace with your actual API base URL
 
 const getVenueTypes = async () => {
   try {
