@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import Slider from 'react-slick';
 import Link from 'next/link';
 
-const Coursel_Gallery = () => {
+const Coursel_Gallery = ({firstImage,secondImage}) => {
   const images = [
-    'https://cdn0.weddingwire.com/vendor/947927/original/1920/jpg/ar0a2630_51_729749-165824628775247.webp',
-    'https://cdn0.weddingwire.com/vendor/947927/3_2/640/jpg/aleksia-brady-368_51_729749-169997019378918.webp',
+    firstImage,
+    secondImage,
     // Add more image URLs as needed
   ];
 
