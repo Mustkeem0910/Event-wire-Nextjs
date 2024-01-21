@@ -1,5 +1,5 @@
 import React from 'react'
-import Gallery from './gallery'
+import Gallery from './Gallery'
 
 
 const page = () => {
