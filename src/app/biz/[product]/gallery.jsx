@@ -13,7 +13,7 @@ import { FiPhoneOutgoing } from "react-icons/fi";
 import { useSearchParams } from "next/navigation";
 import { fetchVenuesById, fetchVendorsById } from "@/app/api/api";
 
-const gallery = () => {
+const Gallery = () => {
   const [showNavbar, setShowNavbar] = useState(false);
   const searchParams = useSearchParams();
 
@@ -400,4 +400,4 @@ const gallery = () => {
   );
 };
 
-export default gallery;
+export default Gallery;
