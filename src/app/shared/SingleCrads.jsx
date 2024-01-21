@@ -9,7 +9,7 @@ import { FaRegHeart } from 'react-icons/fa';
 import { MdOutlineKeyboardArrowRight, MdOutlineKeyboardArrowLeft } from "react-icons/md";
 import { getCityById } from '../api/api';
 
-const SingleCrads = ({ data,city }) => {
+const SingleCrads = ({ data,city,onClick }) => {
   const slider = useRef();
   const [cityData, setCityData] = useState(null);
 
@@ -50,7 +50,7 @@ const SingleCrads = ({ data,city }) => {
 
   return (
     <div>
-      <div className="card shadow-2xl h-auto max-h-112 relative ">
+      <div className="card shadow-2xl h-auto max-h-112 relative " onClick={onClick}>
         <Slider ref={slider} {...settings}>
           {images.map((image, index) => (
             <div key={index} className="relative w-full">
@@ -75,7 +75,7 @@ const SingleCrads = ({ data,city }) => {
 
         {/* Static content */}
         <div className="p-2">
-          <h2 className="text-sm text-grey-200 font-semibold">{city && city.name ? city.name : (cityData && cityData.name ? cityData.name : 'Unknown')}</h2>
+          <h2 className="text-sm text-grey-200 font-semibold">{cityData && cityData.name ? cityData.name : (city && city.name ? city.name : 'Unknown')}</h2>
           <h2 className="text-black text-lg font-semibold hover:text-primary">{data.name}</h2>
           <div className="flex items-center mt-1">
             <FaStar className="text-yellow-500 h-5 w-5 mr-1" />

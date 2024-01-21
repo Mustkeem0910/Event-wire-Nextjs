@@ -1,58 +1,306 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Autosuggest from "react-autosuggest";
 import Image from "next/image";
 import MainHeroImage from "../../../public/SearchHero.PNG";
 import { BsSearch } from "react-icons/bs";
 import { IoLocationOutline } from "react-icons/io5";
+import { useSearchParams } from 'next/navigation'
+import {
+  getVendorTypes,
+  getVenueTypes,
+  getCities,
+  getStates,
+  getVenueTypeById,
+  fetchVenues,
+  getCityById,
+  getVendorTypeById,
+  fetchVendors,
+} from "../api/api";
+import { useRouter } from "next/navigation";
 
 const SearchHero = () => {
-  const [search, setSearch] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [venueValue, setVenueValue] = useState("");
+  const [venueSuggestions, setVenueSuggestions] = useState([]);
 
-  const [vendorValue, setVendorValue] = useState("");
-  const [vendorSuggestions, setVendorSuggestions] = useState([]);
   const [locationValue, setLocationValue] = useState("");
   const [locationSuggestions, setLocationSuggestions] = useState([]);
 
-  // Mock data for vendor suggestions (replace it with your actual data)
-  const vendors = ["Vendor1", "Vendor2", "Vendor3", "Vendor4"];
+  const [selectedSuggestion, setSelectedSuggestion] = useState({
+    title: "",
+    suggestion: null,
+  });
+  const [selectedLocationSuggestion, setSelectedLocationSuggestion] =
+    useState(null);
 
-  // Mock data for location suggestions (replace it with your actual data)
-  const locations = ["Location1", "Location2", "Location3", "Location4"];
+  const [venueTypes, setVenueTypes] = useState([]);
+  const [vendorTypes, setVendorTypes] = useState([]);
 
-  // Function to get suggestions based on input value
-  const getSuggestions = (inputValue, data) => {
-    const trimmedValue = inputValue.trim().toLowerCase();
-    const inputLength = trimmedValue.length;
+  const [venueData, setVenueData] = useState({ venues: [] });
+  const [vendorData, setVendorData] = useState({ vendors: [] });
+  const [cityData, setCityData] = useState(null);
 
-    return inputLength === 0
-      ? []
-      : data.filter((item) => item.toLowerCase().includes(trimmedValue));
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const fetchedVenueTypes = await getVenueTypes();
+        const fetchedVendorTypes = await getVendorTypes();
+        setVenueTypes(fetchedVenueTypes);
+        setVendorTypes(fetchedVendorTypes);
+      } catch (error) {
+        console.error("Error fetching venue and vendor types:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Second useEffect for the main data fetching based on URL parameters
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const venueType = searchParams.get("venue_id");
+        const city = searchParams.get("city_id");
+        const vendorType = searchParams.get("vendor_id");
+        const path = window.location.pathname;
+
+        if (path === "/shared/") {
+          if (venueType && !city) {
+            const fetchedVenueData = await getVenueTypeById(venueType);
+            setVenueData({ venues: fetchedVenueData.venues });
+          } else if (venueType && city) {
+            const fetchedVenueData = await getVenueTypeById(venueType);
+            const filteredVenues = fetchedVenueData.venues.filter(
+              (venue) => parseInt(city) === venue.city
+            );
+            setVenueData({ venues: filteredVenues });
+            const fetchedCityData = await getCityById(city);
+            setCityData(fetchedCityData);
+          } else if (!venueType && city) {
+            const allVenues = await fetchVenues();
+            const filteredVenues = allVenues.filter(
+              (venue) => parseInt(city) === venue.city
+            );
+            setVenueData({ venues: filteredVenues });
+            const fetchedCityData = await getCityById(city);
+            setCityData(fetchedCityData);
+          } else {
+            const fetchedVenueData = await fetchVenues();
+            setVenueData({ venues: fetchedVenueData });
+          }
+        } else if (path === "/shared/vendor/") {
+          if (vendorType && !city) {
+            const fetchedVendorData = await getVendorTypeById(vendorType);
+            setVendorData({ vendors: fetchedVendorData.vendors });
+          } else if (vendorType && city) {
+            const fetchedVendorData = await getVendorTypeById(vendorType);
+            const filteredVendors = fetchedVendorData.vendors.filter(
+              (vendor) => parseInt(city) === vendor.city
+            );
+            setVendorData({ vendors: filteredVendors });
+            const fetchedCityData = await getCityById(city);
+            setCityData(fetchedCityData);
+          } else if (!vendorType && city) {
+            const allVendors = await fetchVendors();
+            const filteredVendors = allVendors.filter(
+              (vendor) => parseInt(city) === vendor.city
+            );
+            setVendorData({ vendors: filteredVendors });
+            const fetchedCityData = await getCityById(city);
+            setCityData(fetchedCityData);
+          } else {
+            const fetchedVendorData = await fetchVendors();
+            setVendorData({ vendors: fetchedVendorData });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching venue or vendor data:", error);
+      }
+    };
+
+    fetchData();
+  }, [searchParams]);
+
+  const getVenueSuggestions = async (value) => {
+    try {
+      const venueTypes = await getVenueTypes();
+      const vendorTypes = await getVendorTypes();
+
+      const allVenueSuggestions = [
+        {
+          title: "Venues",
+          suggestions: venueTypes.map((venue) => ({
+            id: venue.id.toString(),
+            text: venue.type,
+          })),
+        },
+        {
+          title: "Vendors",
+          suggestions: vendorTypes.map((vendorType) => ({
+            id: vendorType.id.toString(),
+            text: vendorType.name,
+          })),
+        },
+      ];
+
+      const inputValue = value.trim().toLowerCase();
+      const inputLength = inputValue.length;
+
+      return inputLength === 0
+        ? []
+        : allVenueSuggestions
+            .map((section) => ({
+              ...section,
+              suggestions: section.suggestions.filter((suggestion) =>
+                suggestion.text.toLowerCase().includes(inputValue)
+              ),
+            }))
+            .filter((section) => section.suggestions.length > 0);
+    } catch (error) {
+      console.error("Error fetching venue suggestions:", error);
+      return [];
+    }
   };
 
-  // Function to handle vendor input change
-  const handleVendorChange = (event) => {
-    const newValue = event.target.value;
-    setVendorValue(newValue);
-    setVendorSuggestions(getSuggestions(newValue, vendors));
+  const getLocationSuggestions = async (value) => {
+    try {
+      const states = await getStates();
+
+      const allLocationSuggestions = states.map((state) => ({
+        title: state.name,
+        suggestions: state.cities.map((city) => ({
+          id: city.id.toString(),
+          text: city.name,
+        })),
+      }));
+
+      const inputValue = value.trim().toLowerCase();
+      const inputLength = inputValue.length;
+
+      return inputLength === 0
+        ? []
+        : allLocationSuggestions
+            .map((section) => ({
+              ...section,
+              suggestions: section.suggestions.filter((suggestion) =>
+                suggestion.text.toLowerCase().includes(inputValue)
+              ),
+            }))
+            .filter((section) => section.suggestions.length > 0);
+    } catch (error) {
+      console.error("Error fetching location suggestions:", error);
+      return [];
+    }
   };
 
-  // Function to handle vendor suggestion selection
-  const handleVendorSelection = (value) => {
-    setVendorValue(value);
-    setVendorSuggestions([]);
+  const onVenueSuggestionsFetchRequested = async ({ value }) => {
+    try {
+      const suggestions = await getVenueSuggestions(value);
+      setVenueSuggestions(suggestions);
+    } catch (error) {
+      console.error("Error fetching venue suggestions:", error);
+      setVenueSuggestions([]);
+    }
   };
 
-  // Function to handle location input change
-  const handleLocationChange = (event) => {
-    const newValue = event.target.value;
-    setLocationValue(newValue);
-    setLocationSuggestions(getSuggestions(newValue, locations));
+  const onLocationSuggestionsFetchRequested = async ({ value }) => {
+    try {
+      const suggestions = await getLocationSuggestions(value);
+      setLocationSuggestions(suggestions);
+    } catch (error) {
+      console.error("Error fetching location suggestions:", error);
+      setLocationSuggestions([]);
+    }
   };
 
-  // Function to handle location suggestion selection
-  const handleLocationSelection = (value) => {
-    setLocationValue(value);
+  const onSuggestionsClearRequested = () => {
+    setVenueSuggestions([]);
     setLocationSuggestions([]);
+  };
+
+  const onVenueSuggestionSelected = (event, { suggestion }) => {
+    let sectionTitle = "N/A";
+
+    if (suggestion) {
+      if (venueTypes.some((venue) => venue.type === suggestion.text)) {
+        sectionTitle = "Venues";
+      } else if (
+        vendorTypes.some((vendorType) => vendorType.name === suggestion.text)
+      ) {
+        sectionTitle = "Vendors";
+      }
+    }
+
+    setSelectedSuggestion({
+      title: sectionTitle,
+      suggestion,
+    });
+
+    // Log to console
+    console.log("Selected Venue Suggestion:", suggestion);
+    console.log("Section Title:", sectionTitle);
+  };
+
+  const onLocationSuggestionSelected = (event, { suggestion }) => {
+    setSelectedLocationSuggestion(suggestion);
+    console.log("Selected Location Suggestion:", suggestion);
+    // You can perform additional actions here if needed
+  };
+
+  const getSuggestionValue = (suggestion) => suggestion.text;
+
+  const renderSuggestion = (suggestion) => (
+    <div className="suggestion-item mb-1">
+      {suggestion.section ? (
+        <div className="section-title mb-2">
+          <strong>{suggestion.section.title}</strong>
+        </div>
+      ) : (
+        <div>{suggestion.text}</div>
+      )}
+    </div>
+  );
+
+  const renderSectionTitle = (section) => (
+    <div className="section-title mb-2">
+      <strong>{section.title}</strong>
+    </div>
+  );
+
+  const getSectionSuggestions = (section) => {
+    if (section && section.suggestions) {
+      return section.suggestions;
+    }
+    return [];
+  };
+
+  const search = () => {
+    // You can pass the selected data as query parameters
+    if (selectedSuggestion.title === "Venues") {
+      router.push(
+        `/shared?venue_id=${selectedSuggestion.suggestion.id}&city_id=${selectedLocationSuggestion.id}`
+      );
+    } else if (selectedSuggestion.title === "Vendors") {
+      router.push(
+        `/shared/vendor?vendor_id=${selectedSuggestion.suggestion.id}&city_id=${selectedLocationSuggestion.id}`
+      );
+    }
+  };
+
+  const venueInputProps = {
+    placeholder: "Search for items",
+    value: venueValue,
+    onChange: (event, { newValue }) => setVenueValue(newValue),
+    className: "px-4 py-4 focus:outline-none",
+  };
+
+  const locationInputProps = {
+    ...venueInputProps,
+    placeholder: "Search for locations",
+    value: locationValue,
+    onChange: (event, { newValue }) => setLocationValue(newValue),
   };
 
   return (
@@ -71,7 +319,7 @@ const SearchHero = () => {
               <li className="inline-flex items-center">
                 <a
                   className="flex items-center text-sm text-black hover:text-primary focus:outline-none focus:text-primary "
-                  href="#"
+                  href="/"
                 >
                   Home
                 </a>
@@ -145,31 +393,24 @@ const SearchHero = () => {
           {/* Sreach */}
           <div className="hidden sm:block md:block lg:block xl:block 2xl:block 3xl:block">
             <div className="w-1/2 mt-5 relative flex items-center shadow-lg ">
-              {/* Search Input for Vendors */}
-              <div className="flex items-center border shadow-lg rounded-l-md border-gray-300">
+              {/* Search Input for Venues with Autosuggest */}
+              <div className="flex items-center relative border shadow-lg rounded-l-md border-gray-300">
                 <span className="ml-3 mr-1">
-                  <BsSearch className="text-black" />
+                  <BsSearch className="text-black " />
                 </span>
-                <input
-                  type="search"
-                  placeholder="Search for vendors"
-                  value={vendorValue}
-                  onChange={handleVendorChange}
-                  className="px-4 py-4 focus:outline-none"
+
+                <Autosuggest
+                  multiSection={true}
+                  suggestions={venueSuggestions}
+                  onSuggestionsFetchRequested={onVenueSuggestionsFetchRequested}
+                  onSuggestionsClearRequested={onSuggestionsClearRequested}
+                  getSuggestionValue={getSuggestionValue}
+                  renderSuggestion={renderSuggestion}
+                  renderSectionTitle={renderSectionTitle}
+                  getSectionSuggestions={getSectionSuggestions}
+                  onSuggestionSelected={onVenueSuggestionSelected}
+                  inputProps={venueInputProps}
                 />
-                {vendorSuggestions.length > 0 && (
-                  <ul className="absolute bg-white border border-gray-300 mt-2 p-4 top-14 rounded-lg shadow-xl w-full  ">
-                    {vendorSuggestions.map((suggestion) => (
-                      <li
-                        key={suggestion}
-                        onClick={() => handleVendorSelection(suggestion)}
-                        className="cursor-pointer text-black flex justify-center mb-2"
-                      >
-                        {suggestion}
-                      </li>
-                    ))}
-                  </ul>
-                )}
               </div>
 
               {/* Search Input for Location */}
@@ -177,30 +418,27 @@ const SearchHero = () => {
                 <span className="ml-3 mr-1">
                   <IoLocationOutline className="text-black text-xl" />
                 </span>
-                <input
-                  type="search"
-                  placeholder="Location"
-                  value={locationValue}
-                  onChange={handleLocationChange}
-                  className="px-4 py-4 xl:px-1 focus:outline-none"
+                <Autosuggest
+                  multiSection={true}
+                  suggestions={locationSuggestions}
+                  onSuggestionsFetchRequested={
+                    onLocationSuggestionsFetchRequested
+                  }
+                  onSuggestionsClearRequested={onSuggestionsClearRequested}
+                  getSuggestionValue={getSuggestionValue}
+                  renderSuggestion={renderSuggestion}
+                  renderSectionTitle={renderSectionTitle}
+                  getSectionSuggestions={getSectionSuggestions}
+                  onSuggestionSelected={onLocationSuggestionSelected}
+                  inputProps={locationInputProps}
                 />
-                {locationSuggestions.length > 0 && (
-                  <ul className="absolute bg-white border border-gray-300 mt-2 top-14 p-2 rounded-md w-full">
-                    {locationSuggestions.map((suggestion) => (
-                      <li
-                        key={suggestion}
-                        onClick={() => handleLocationSelection(suggestion)}
-                        className="cursor-pointer text-black flex justify-center mb-2"
-                      >
-                        {suggestion}
-                      </li>
-                    ))}
-                  </ul>
-                )}
               </div>
 
               {/* Search Button */}
-              <button className="bg-primary text-white shadow-lg px-4 py-4 rounded-r-md">
+              <button
+                className="bg-primary text-white shadow-lg px-4 py-4 rounded-r-md"
+                onClick={search}
+              >
                 Search
               </button>
             </div>
@@ -215,26 +453,20 @@ const SearchHero = () => {
                   <span className="ml-3 mr-1">
                     <BsSearch className="text-black" />
                   </span>
-                  <input
-                    type="search"
-                    placeholder="Search for vendors"
-                    value={vendorValue}
-                    onChange={handleVendorChange}
-                    className="px-4 py-2 focus:outline-none"
+                  <Autosuggest
+                    multiSection={true}
+                    suggestions={venueSuggestions}
+                    onSuggestionsFetchRequested={
+                      onVenueSuggestionsFetchRequested
+                    }
+                    onSuggestionsClearRequested={onSuggestionsClearRequested}
+                    getSuggestionValue={getSuggestionValue}
+                    renderSuggestion={renderSuggestion}
+                    renderSectionTitle={renderSectionTitle}
+                    getSectionSuggestions={getSectionSuggestions}
+                    onSuggestionSelected={onVenueSuggestionSelected}
+                    inputProps={venueInputProps}
                   />
-                  {vendorSuggestions.length > 0 && (
-                    <ul className="absolute bg-white border border-gray-300 mt-2 p-4  rounded-lg shadow-xl w-full top-10 z-10 ">
-                      {vendorSuggestions.map((suggestion) => (
-                        <li
-                          key={suggestion}
-                          onClick={() => handleVendorSelection(suggestion)}
-                          className="cursor-pointer text-black flex justify-center mb-2"
-                        >
-                          {suggestion}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
                 </div>
 
                 {/* Search Input for Location */}
@@ -242,30 +474,27 @@ const SearchHero = () => {
                   <span className="ml-3 mr-1">
                     <IoLocationOutline className="text-black text-xl" />
                   </span>
-                  <input
-                    type="search"
-                    placeholder="Location"
-                    value={locationValue}
-                    onChange={handleLocationChange}
-                    className="px-4 py-2  focus:outline-none"
+                  <Autosuggest
+                    multiSection={true}
+                    suggestions={locationSuggestions}
+                    onSuggestionsFetchRequested={
+                      onLocationSuggestionsFetchRequested
+                    }
+                    onSuggestionsClearRequested={onSuggestionsClearRequested}
+                    getSuggestionValue={getSuggestionValue}
+                    renderSuggestion={renderSuggestion}
+                    renderSectionTitle={renderSectionTitle}
+                    getSectionSuggestions={getSectionSuggestions}
+                    onSuggestionSelected={onLocationSuggestionSelected}
+                    inputProps={locationInputProps}
                   />
-                  {locationSuggestions.length > 0 && (
-                    <ul className="absolute bg-white border border-gray-300 mt-2 top-10 p-2 rounded-md w-full z-10">
-                      {locationSuggestions.map((suggestion) => (
-                        <li
-                          key={suggestion}
-                          onClick={() => handleLocationSelection(suggestion)}
-                          className="cursor-pointer text-black flex justify-center mb-2"
-                        >
-                          {suggestion}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
                 </div>
 
                 {/* Search Button */}
-                <button className=" bg-white shadow-lg px-4 py-2 rounded-md  text-black  font-semibold border border-black border-1  hover:bg-primary  hover:border-primary hover:text-white">
+                <button
+                  className=" bg-white shadow-lg px-4 py-2 rounded-md  text-black  font-semibold border border-black border-1  hover:bg-primary  hover:border-primary hover:text-white"
+                  onClick={search}
+                >
                   Search
                 </button>
               </div>
@@ -282,5 +511,4 @@ const SearchHero = () => {
     </>
   );
 };
-
 export default SearchHero;

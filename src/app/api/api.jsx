@@ -226,4 +226,26 @@ const getCities = async () => {
     }
   };
 
+  export const fetchVenuesById = async (id) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/venues/${id}/`);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      throw error; // Rethrow the error to handle it in the component
+    }
+  };
+
+  export const fetchVendorsById = async (id) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/vendors/${id}/`);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      throw error; // Rethrow the error to handle it in the component
+    }
+  };
+
 export { getVenueTypes, getVendorTypes,getStates, getCities, postFormData,fetchVenues, fetchVendors };

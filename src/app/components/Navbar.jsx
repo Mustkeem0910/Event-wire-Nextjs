@@ -15,6 +15,7 @@ import { BiDish } from "react-icons/bi";
 import { GiLipstick } from "react-icons/gi";
 import { LiaUserTieSolid } from "react-icons/lia";
 import { getVenueTypes } from "../api/api";
+import Link from 'next/link';
 
 const Navbar = () => {
   const [showDrawer, setShowDrawer] = useState(false);
@@ -31,7 +32,7 @@ const Navbar = () => {
 
   // For list
   const ListWithIcon = ({ icon, text, size, color }) => (
-    <div className="flex items-center cursor-pointer">
+    <div className="flex items-center cursor-pointer mb-4">
       {React.cloneElement(icon, { size, color })}
       <span className="ml-2 text-black hover:text-primary">{text}</span>
     </div>
@@ -198,34 +199,45 @@ const Navbar = () => {
                           </h1>
                           <div className="w-full flex ">
                             <div className="w-1/2 space-y-5">
-                              <ListWithIcon
+                            <Link href="/tools/checklist">
+                             <ListWithIcon
                                 icon={<TbCheckupList />}
                                 text="Checklist"
                                 size={24}
                               />
+                             </Link>
+                             <Link href="/tools/seating">
                               <ListWithIcon
                                 icon={<LuArmchair />}
                                 text="Seating Chart"
                                 size={24}
                               />
+                                </Link>
+                                <Link href="/tools/vendors">
                               <ListWithIcon
                                 icon={<LiaBookSolid />}
                                 text="Vendors"
                                 size={24}
                               />
+                                </Link>
+                              
                             </div>
 
                             <div className="w-1/2 space-y-5">
+                            <Link href="/tools/guests">
                               <ListWithIcon
                                 icon={<MdPeopleOutline />}
                                 text="Guests"
                                 size={24}
                               />
+                                </Link>
+                                <Link href="/tools/budget">
                               <ListWithIcon
                                 icon={<SlCalculator />}
                                 text="Budget"
                                 size={24}
                               />
+                                </Link>
 
                               {/* <ListWithIcon icon={<TbWorldWww />} text=" Website" size={24}  /> */}
                             </div>
@@ -233,7 +245,7 @@ const Navbar = () => {
                         </div>
                         <div className="divider divider-horizontal"></div>
 
-                        <div className="w-2/5">
+                        {/* <div className="w-2/5">
                           <h1 className="text-black font-semibold mb-5 ">
                             Personalize your event
                           </h1>
@@ -250,7 +262,7 @@ const Navbar = () => {
                               <List text="Cost Guide" />
                             </div>
                           </div>
-                        </div>
+                        </div> */}
                         <div className="w-2/5"></div>
                       </div>
                     )}

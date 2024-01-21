@@ -4,8 +4,8 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { MdOutlineKeyboardArrowRight, MdOutlineKeyboardArrowLeft } from 'react-icons/md';
-
-const SingleVendorCards = (data,city,name) => {
+import { useRouter } from 'next/navigation';
+const SingleVendorCards = (data,city,name, onClick) => {
   const slider = useRef();
 
   const next = () => {
@@ -39,8 +39,15 @@ const SingleVendorCards = (data,city,name) => {
     return truncatedText;
   };
 
+  const router = useRouter();
+
+  const handleSlideClick = (id, name) => {
+    console.log("clicked");
+    router.push(`/biz/${name}?type=2&id=${id}`);
+  };
+
   return (
-    <div className="card shadow-2xl w-70 h-auto max-h-112">
+    <div className="card shadow-2xl w-70 h-auto max-h-112" onClick={() => handleSlideClick(data.data.id,data.data.name)}>
       <Slider ref={slider} {...settings}>
         {images.map((image, index) => (
           <div key={index} className="relative w-full">

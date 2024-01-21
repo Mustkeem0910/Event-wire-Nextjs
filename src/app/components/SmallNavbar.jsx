@@ -400,7 +400,7 @@ const SmallNavbar = () => {
             <li
               className="cursor-pointer text-black py-2 font-semibold"
               onClick={() =>
-                handleDrawerItemClicked("/planning-tools/checklist")
+                handleDrawerItemClicked("/tools/checklist")
               }
             >
               View all
@@ -409,7 +409,7 @@ const SmallNavbar = () => {
             <li
               className="cursor-pointer text-black py-2"
               onClick={() =>
-                handleDrawerItemClicked("/planning-tools/checklist")
+                handleDrawerItemClicked("/tools/checklist")
               }
             >
               Checklist
@@ -417,7 +417,7 @@ const SmallNavbar = () => {
             <li
               className="cursor-pointer text-black py-2"
               onClick={() =>
-                handleDrawerItemClicked("/planning-tools/seating-chart")
+                handleDrawerItemClicked("/tools/seating")
               }
             >
               Seating Chart
@@ -426,7 +426,7 @@ const SmallNavbar = () => {
             <li
               className="cursor-pointer text-black py-2"
               onClick={() =>
-                handleDrawerItemClicked("/planning-tools/checklist")
+                handleDrawerItemClicked("/tools/vendors")
               }
             >
               Vendors
@@ -434,7 +434,7 @@ const SmallNavbar = () => {
             <li
               className="cursor-pointer text-black py-2"
               onClick={() =>
-                handleDrawerItemClicked("/planning-tools/seating-chart")
+                handleDrawerItemClicked("/tools/guests")
               }
             >
               Guests
@@ -442,7 +442,7 @@ const SmallNavbar = () => {
             <li
               className="cursor-pointer text-black py-2"
               onClick={() =>
-                handleDrawerItemClicked("/planning-tools/checklist")
+                handleDrawerItemClicked("/tools/budget")
               }
             >
               Budget
@@ -451,7 +451,7 @@ const SmallNavbar = () => {
 
           <div class="border-t  border-gray-300"></div>
 
-          <ul className="p-4">
+          {/* <ul className="p-4">
             <li
               className="cursor-pointer text-black py-2 font-semibold"
               onClick={() =>
@@ -502,7 +502,7 @@ const SmallNavbar = () => {
             >
               Cost Guide
             </li>
-          </ul>
+          </ul> */}
         </div>
       )}
 
@@ -602,7 +602,7 @@ const SmallNavbar = () => {
                 className="cursor-pointer text-black py-2"
                 onClick={() => {
                   console.log("Clicked!");
-                  router.push(`/shared/vendor?vendor_id=${vendorType.id}`);
+                  router.push(`/shared?venue_id=${vendorType.id}`);
                 }}
               >
                 {vendorType.name}

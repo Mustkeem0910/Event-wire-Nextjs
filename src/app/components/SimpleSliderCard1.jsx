@@ -1,11 +1,13 @@
 "use client"
-import React, { Component } from "react";
+import React from "react";
 import Slider from "react-slick";
 import { FaStar } from 'react-icons/fa';
 import { HiOutlineUserGroup } from 'react-icons/hi';
 import { CiTrophy } from 'react-icons/ci';
 import { MdOutlineKeyboardArrowRight, MdOutlineKeyboardArrowLeft } from "react-icons/md";
+import { useRouter } from "next/navigation";
 
+// SampleNextArrow and SamplePrevArrow components
 function SampleNextArrow(props) {
   const { className, style, onClick } = props;
   return (
@@ -24,11 +26,15 @@ function SamplePrevArrow(props) {
   );
 }
 
-export default class CustomArrows extends Component {
-  
-  render() {
-    const { venues } = this.props;
-    const settings = {
+// Functional component CustomArrows
+const CustomArrows = ({ venues }) => {
+  const router = useRouter();
+
+  const handleSlideClick = (id, name) => {
+    router.push(`/biz/${name}?type=1&id=${id}`);
+  };
+
+  const settings = {
     dots: true,
     infinite: true,
     slidesToShow: 4,
@@ -36,13 +42,12 @@ export default class CustomArrows extends Component {
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
   };
-  
 
   return (
     <div>
       <Slider {...settings}>
         {venues.map((venue, index) => (
-          <div key={index} className="card w-full mr-3 p-2">
+          <div key={index} onClick={() => handleSlideClick(venue.id,venue.name)} className="card w-full mr-3 p-2">
             <div className="mt-5 flex justify-between">
               <div className="card shadow-xl">
                 <figure>
@@ -88,5 +93,6 @@ export default class CustomArrows extends Component {
       </Slider>
     </div>
   );
-}
-}
+};
+
+export default CustomArrows;

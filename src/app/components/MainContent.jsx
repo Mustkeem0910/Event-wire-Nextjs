@@ -79,6 +79,14 @@ const MainContent = () => {
     }
   };
 
+  const handleSlideClick = (id, name) => {
+    router.push(`/biz/${name}?type=1&id=${id}`);
+  };
+
+  const handleSlideClick2 = (id, name) => {
+    router.push(`/biz/${name}?type=2&id=${id}`);
+  };
+
 
   const cardsData = [
     // Sample data for cards
@@ -414,7 +422,7 @@ const MainContent = () => {
         <div className="mt-2 md:mt-2 overflow-x-auto scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-gray-500 xl:hidden 2xl:hidden 3xl:hidden">
   <div className="flex space-x-4 scrollbar-hide scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-gray-500 flex-shrink-0">
     {venues.map((venue, index) => (
-      <div key={index} className="shadow-xl ">
+      <div key={index} onClick={() => handleSlideClick(venue.id,venue.name)} className="shadow-xl ">
         <div className="mt-2 w-72  flex justify-between card shadow-xl">
           <figure>
             {/* Assuming 'images' array exists and has at least one image */}
@@ -479,7 +487,7 @@ const MainContent = () => {
             {/* <h2 className="text-2xl font-bold mb-2">{vendorType.name}</h2> */}
             <div className="flex space-x-4">
               {vendorType.vendors.map((vendor, index) => (
-                <div key={index} className="shadow-xl">
+                <div key={index} onClick={() => handleSlideClick2(vendor.id,vendor.name)} className="shadow-xl">
                   <div className="mt-2 w-72  flex justify-between card shadow-xl">
                     <div className="card  shadow-xl">
                       <figure>
@@ -568,7 +576,7 @@ const MainContent = () => {
             {/* <h2 className="text-2xl font-bold mb-2">{vendorType.name}</h2> */}
             <div className="flex space-x-4">
               {vendorType.vendors.map((vendor, index) => (
-                <div key={index} className="shadow-xl">
+                <div key={index} onClick={() => handleSlideClick2(vendor.id,vendor.name)} className="shadow-xl">
                   <div className="mt-2 w-72  flex justify-between card shadow-xl">
                     <div className="card  shadow-xl">
                       <figure>
@@ -748,7 +756,7 @@ const MainContent = () => {
       </div>
 
       {/*======================= Why WeddingWire?================================= */}
-      <section className="mx-4 mt-4 sm:mt-5 md:mt-5 lg:mt-10 xl:mt-10 2xl:mt-10 3xl:mt-10  sm:mx-4  xl:mx-20 2xl:mx-20 3xl:mx-20 font-[Poppins] ">
+      <section className="mx-4 mt-4 sm:mt-5 md:mt-5 lg:mt-10 xl:mt-10 2xl:mt-10 3xl:mt-10  sm:mx-4  xl:mx-20 2xl:mx-20 3xl:mx-20 font-[Poppins] " id='aboutUsSection'>
         <h1 className="text-xl sm:text-xl md:text-2xl lg:text-3xl xl:text-3xl 2xl:text-3xl  3xl:text-3xl text-black font-semibold">Why CompanyName?</h1>
         <p className="text-sm sm:text-sm md:text-md lg:text-lg xl:text-lg 2xl:text-lg  3xl:text-lg text-black  mt-5 font-[sans]">
 Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum est accusantium nemo nisi. Itaque architecto tempore repudiandae hic eos provident dolorem at nemo a officiis aperiam ipsa dolor eveniet, nam ullam obcaecati autem ipsum voluptatibus vitae, velit aliquid id recusandae! Deleniti, eius numquam saepe quae quia rerum possimus minus facilis?
