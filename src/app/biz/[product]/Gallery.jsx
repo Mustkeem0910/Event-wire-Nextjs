@@ -229,7 +229,7 @@ const Gallery = () => {
 
         {/* =================Gallery Section for screen screen less then md================== */}
         <div className="w-full flex flex-col  md:hidden ">
-          <Coursel_Gallery />
+          <Coursel_Gallery firstImage={firstImage} secondImage={secondImage}/>
 
           {/* ==========Navlink Section ========= */}
           <div className="px-3 mt-3 hidden xl:block">
