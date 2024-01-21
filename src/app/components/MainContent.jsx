@@ -747,14 +747,6 @@ const MainContent = () => {
     {/* =====================Plan your destination Event======================= */}
     <Plan_Trip/>
 
-      <div className='hidden lg:block '>
-      <div className="mt-5 flex justify-center  sm:mx-20 font-[Poppins] ">
-        <button className="bg-white text-black py-2 btn btn-md px-4 rounded cursor-pointer  hover:bg-primary hover:text-white border border-black hover:border-primary  transform hover:scale-105 transition-transform duration-300">
-          View all destinations <FaArrowRightLong className="text-xl" />
-        </button>
-      </div>
-      </div>
-
       {/*======================= Why WeddingWire?================================= */}
       <section className="mx-4 mt-4 sm:mt-5 md:mt-5 lg:mt-10 xl:mt-10 2xl:mt-10 3xl:mt-10  sm:mx-4  xl:mx-20 2xl:mx-20 3xl:mx-20 font-[Poppins] " id='aboutUsSection'>
         <h1 className="text-xl sm:text-xl md:text-2xl lg:text-3xl xl:text-3xl 2xl:text-3xl  3xl:text-3xl text-black font-semibold">Why CompanyName?</h1>
